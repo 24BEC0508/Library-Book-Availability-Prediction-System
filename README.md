@@ -82,7 +82,7 @@ python demo.py
 ## 3. Key Engineering Achievements & Repaired Pipeline
 
 1. **Repaired Data Truncation**:
-   - The original `training_data.csv` was previously truncated at `2026-01-10` due to memory exhaustion during 12.5M row DataFrame concatenation.
+   - The actual original `training_data.csv` was previously truncated at `2026-01-10` due to memory exhaustion during 12.5M row DataFrame concatenation.
    - Re-engineered [`ml/build_training_data.py`](file:///ml/build_training_data.py) using dense 2D matrix representations ($\approx 50$ MB RAM) and chronological block streaming, successfully generating the untruncated **12,569,830 rows** spanning `2023-01-08` through `2026-08-29`.
 2. **Strict Time-Window Verification**:
    - Features at date $t$ strictly use historical transactions through $t-1$.
