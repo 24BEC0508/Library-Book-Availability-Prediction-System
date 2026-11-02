@@ -1,0 +1,275 @@
+/* ==========================================================================
+   Apex University Library - Administrator Portal Styles
+   ========================================================================== */
+
+/* Admin Header Extensions */
+.admin-badge-staff {
+  background-color: #3b82f6;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Admin Layout: Sidebar + Main Content */
+.admin-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 850px) {
+  .admin-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Admin Sidebar Navigation */
+.admin-sidebar {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+  padding: 12px;
+  position: sticky;
+  top: 75px;
+}
+
+.admin-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  margin-bottom: 4px;
+  text-decoration: none;
+}
+.admin-nav-item:hover {
+  background-color: var(--bg-subtle);
+  color: var(--brand-navy);
+  text-decoration: none;
+}
+.admin-nav-item.active {
+  background-color: var(--brand-light);
+  color: var(--brand-primary);
+  border-color: #bfdbfe;
+}
+.admin-nav-icon {
+  font-size: 1.05rem;
+}
+
+/* Admin Security / Key Verification Box */
+.admin-auth-box {
+  background-color: #f8fafc;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  margin-top: 14px;
+  font-size: 0.78rem;
+}
+.admin-auth-label {
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  margin-bottom: 4px;
+  display: block;
+}
+.admin-key-input {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 0.8rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  font-family: var(--font-mono);
+}
+
+/* Admin Tab Sections */
+.admin-tab-pane {
+  display: none;
+}
+.admin-tab-pane.active {
+  display: block;
+}
+
+/* Overview KPIs */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  box-shadow: var(--shadow-xs);
+}
+.kpi-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.kpi-num {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--brand-navy);
+  line-height: 1.1;
+}
+.kpi-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Circulation Desk Forms */
+.circulation-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+@media (max-width: 700px) {
+  .circulation-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.circ-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-xs);
+}
+.circ-card.checkout-card {
+  border-top: 4px solid var(--brand-primary);
+}
+.circ-card.return-card {
+  border-top: 4px solid var(--status-safe);
+}
+
+.circ-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--brand-navy);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+.form-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+.form-control {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-family: inherit;
+  background-color: var(--bg-surface);
+}
+.form-control:focus {
+  border-color: var(--border-focus);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+.form-help {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+/* Data Tables */
+.table-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-xs);
+  margin-bottom: 24px;
+}
+.table-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.table-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--brand-navy);
+}
+
+.table-responsive {
+  overflow-x: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: left;
+}
+.admin-table th {
+  background-color: var(--bg-subtle);
+  color: var(--text-secondary);
+  font-weight: 600;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-strong);
+  white-space: nowrap;
+}
+.admin-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+.admin-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Recent Transaction Receipt */
+.tx-receipt-banner {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin-top: 14px;
+  font-size: 0.85rem;
+  color: #166534;
+  display: none;
+}
+.tx-receipt-banner.visible {
+  display: block;
+}

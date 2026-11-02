@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apex University Library | Catalog & Availability Predictor</title>
+  <meta name="description" content="Search Apex University library catalog, check real-time book availability, and view 7-day demand forecasts.">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/student.css">
+</head>
+<body>
+
+  <!-- Institutional Demo Mode Banner -->
+  <aside class="demo-banner" id="operational-mode-banner" role="status" aria-label="Operational Mode">
+    <span class="demo-badge" id="operational-mode-badge">DigitalOcean Cloud</span>
+    <span id="operational-mode-text">Connected to live DigitalOcean production node. Live transactions update in real time.</span>
+  </aside>
+
+  <!-- Institutional Navigation Header -->
+  <header class="institution-header">
+    <div class="header-inner">
+      <a href="/" class="brand-identity" aria-label="Apex University Library Home">
+        <div class="brand-emblem">🏛️</div>
+        <div class="brand-text">
+          <h1>Apex University Library</h1>
+          <p>Book Availability & Circulation Intelligence</p>
+        </div>
+      </a>
+      <nav class="header-nav" aria-label="Primary Navigation">
+        <a href="#catalog-section" class="nav-link active" id="nav-catalog-btn">Catalog Search</a>
+        <a href="#borrowed-section" class="nav-link" id="nav-borrowed-btn">
+          My Borrowed Books
+          <span class="badge badge-info" id="borrowed-count-pill" style="display:none; font-size: 0.72rem; padding: 2px 7px; margin-left: 5px;">0</span>
+        </a>
+        <a href="#exam-schedule-section" class="nav-link">Exam Periods</a>
+        <a href="#policy-section" class="nav-link">Borrowing Policy</a>
+        <a href="/admin" class="btn-nav-portal" title="Access library staff administration console">
+          ⚙️ Staff Portal
+        </a>
+      </nav>
+
+      <!-- Simulated Demo Borrower Profile Selector -->
+      <div class="demo-profile-badge" title="Local demo student identity profile">
+        <span class="demo-profile-label">Borrower:</span>
+        <select id="student-identity-select" class="demo-profile-select" aria-label="Active Demo Borrower Identity">
+          <option value="STU-2026-042">Alex Chen (STU-2026-042 - CS)</option>
+          <option value="STU-2026-108">Priya Sharma (STU-2026-108 - ME)</option>
+          <option value="STU-2026-215">Rohan Das (STU-2026-215 - EE)</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="main-wrapper" id="main-content">
+
+    <!-- Catalog View Wrapper -->
+    <div id="catalog-view-wrapper">
+
+    <!-- Hero Search Section -->
+    <section class="student-hero" aria-label="Search Library Holdings">
+      <div class="hero-headline">
+        <h2>Find Library Books & Forecast Availability</h2>
+        <p>
+          Search holdings across 16 academic departments. Check current physical copies on shelf
+          and review forward-looking 7-day demand forecasts to plan study loans ahead of peak exam cycles.
+        </p>
+        <div class="policy-callout">
+          <strong>Borrowing Policy:</strong> Strictly <strong>First-Come, First-Served (FCFS)</strong>. Demand forecasts are an advisory planning aid and do not alter circulation priority.
+        </div>
+      </div>
+
+      <!-- Search Input with Real-Time Autocomplete -->
+      <form id="search-form" class="search-wrapper" role="search" aria-label="Book Search">
+        <div class="search-input-group">
+          <span class="search-icon" aria-hidden="true">🔍</span>
+          <input
+            type="search"
+            id="search-input"
+            class="search-input"
+            placeholder="Search by book title or author name (e.g., Strength of Materials, Bansal)..."
+            autocomplete="off"
+            aria-autocomplete="list"
+            aria-controls="autocomplete-menu"
+            aria-label="Search books by title or author"
+          >
+          <button type="button" id="search-clear-btn" class="search-clear-btn" aria-label="Clear search input">&times;</button>
+        </div>
+
+        <!-- Autocomplete Suggestions Menu -->
+        <div id="autocomplete-menu" class="autocomplete-menu" role="listbox" aria-label="Search suggestions"></div>
+      </form>
+
+      <!-- Category Filter Chips -->
+      <nav class="category-chips" id="category-chips" aria-label="Subject filter chips">
+        <button type="button" class="chip active" data-dept="">All Subjects</button>
+        <span style="font-size: 0.8rem; color: var(--text-muted); align-self: center;">Loading departments...</span>
+      </nav>
+    </section>
+
+    <!-- Upcoming Academic Exam Alert Card -->
+    <section class="exam-alert-card" id="exam-schedule-section" aria-label="Upcoming Academic Examinations">
+      <div class="exam-alert-left">
+        <h4>Authoritative University Academic Calendar (Asia/Kolkata)</h4>
+        <div class="exam-name" id="exam-name">Checking academic calendar...</div>
+        <div class="exam-dates" id="exam-dates">Connecting to registrar schedule...</div>
+      </div>
+      <div>
+        <span class="badge badge-info" id="exam-badge">Calculating Countdown...</span>
+      </div>
+    </section>
+
+    <!-- Catalog Browse & Results Section -->
+    <section id="catalog-section" aria-label="Catalog Results">
+      
+      <!-- Toolbar: Filters and Stats -->
+      <div class="catalog-toolbar">
+        <div class="toolbar-filters">
+          <div class="filter-group">
+            <label for="dept-filter">Department:</label>
+            <select id="dept-filter" class="filter-select">
+              <option value="">All Departments</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="avail-filter">Availability:</label>
+            <select id="avail-filter" class="filter-select">
+              <option value="all">All Copies</option>
+              <option value="available">Available Now (> 0)</option>
+              <option value="low">Low Stock (&le; 2 left)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="toolbar-stats" id="toolbar-stats" role="status" aria-live="polite">
+          Showing catalog titles...
+        </div>
+      </div>
+
+      <!-- Book Cards Grid -->
+      <div class="book-grid" id="book-grid">
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+          Loading library holdings...
+        </div>
+      </div>
+
+      <!-- Pagination Controls -->
+      <nav class="pagination-wrapper" aria-label="Catalog pagination">
+        <button type="button" id="prev-page-btn" class="page-btn" disabled>&larr; Previous</button>
+        <span class="page-indicator" id="page-indicator">Page 1 of 1</span>
+        <button type="button" id="next-page-btn" class="page-btn" disabled>Next &rarr;</button>
+      </nav>
+    </section>
+
+    <!-- Borrowing Policy Details Section -->
+    <section id="policy-section" style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 20px 24px; margin-top: 16px;">
+      <h3 style="color: var(--brand-navy); font-size: 1.1rem; margin-bottom: 8px;">Institutional Borrowing Guidelines & Policy</h3>
+      <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 10px;">
+        All physical catalog holdings are issued on a strictly <strong>First-Come, First-Served (FCFS)</strong> basis upon presenting a valid student identification badge at the central circulation desk.
+      </p>
+      <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+        <strong>How Demand Forecasts Assist You:</strong> The library's machine learning model evaluates recent borrowing velocities and university exam calendars to project anticipated 7-day demand and estimate when popular titles might stock out. This allows you to visit the library early before peak exam rushes. Forecasts represent statistical estimates, not held reservations.
+      </p>
+    </section>
+    </div> <!-- /catalog-view-wrapper -->
+
+    <!-- My Borrowed Books View Section (Toggled via Navigation) -->
+    <section id="borrowed-view-section" class="borrowed-view-section" style="display: none;" aria-label="My Borrowed Books">
+      <div class="borrowed-header-card">
+        <div class="borrowed-header-left">
+          <h2>My Borrowed Books</h2>
+          <p>
+            Review and manage books currently checked out to your student account.
+            Standard loan period is 14 days under university library circulation rules.
+          </p>
+        </div>
+        <div class="borrower-summary-pill" id="borrower-summary-pill">
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Active Account</div>
+          <div style="font-weight: 700; color: var(--brand-navy);" id="borrower-name-display">Alex Chen (STU-2026-042)</div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">
+            <span id="active-loan-count-display">0</span> Active Loans &bull; Strictly FCFS Circulation
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Feedback / Toast Area -->
+      <div id="borrowed-feedback-area"></div>
+
+      <!-- Active Loans Grid -->
+      <div class="borrowed-loans-grid" id="borrowed-loans-grid">
+        <div style="grid-column: 1 / -1; text-align: center; padding: 48px; background: white; border-radius: 8px; border: 1px solid var(--border-subtle); color: var(--text-muted);">
+          Loading your active library loans...
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Book Detail Modal / Drawer -->
+  <div class="modal-overlay" id="book-detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-modal-title">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title" id="detail-modal-title">Book Availability & Demand Trajectory</div>
+        <button type="button" class="btn-close-modal" id="modal-close-btn" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body" id="detail-modal-body">
+        <!-- Injected via student.js -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('book-detail-modal').classList.remove('active')">
+          Close Window
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Institutional Footer -->
+  <footer class="institutional-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <h3>Apex University Library & Learning Commons</h3>
+        <p>
+          Providing students and faculty with comprehensive catalog access, digital reference resources,
+          and predictive circulation insights to support academic success.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>Library Services</h4>
+        <ul>
+          <li><a href="#catalog-section">Search Holdings</a></li>
+          <li><a href="#exam-schedule-section">Academic Calendar</a></li>
+          <li><a href="#policy-section">Borrowing Rules</a></li>
+          <li><a href="/admin">Staff Circulation Portal</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Circulation Desk</h4>
+        <p style="font-size: 0.8rem; color: #94a3b8; line-height: 1.5;">
+          Central Library Building<br>
+          Mon – Sat: 8:00 AM – 10:00 PM<br>
+          Sun: 10:00 AM – 6:00 PM<br>
+          Timezone: Asia/Kolkata
+        </p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>&copy; 2026 Apex University Libraries. Academic Prototype.</div>
+      <div id="operational-mode-footer">Operating on DigitalOcean Cloud</div>
+    </div>
+  </footer>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/student.js"></script>
+</body>
+</html>

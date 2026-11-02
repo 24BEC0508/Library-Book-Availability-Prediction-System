@@ -1,0 +1,122 @@
+[
+  {
+    "calendar_id": "CAL-2026F-CAT1",
+    "academic_year": "2026-2027",
+    "semester": "Fall",
+    "exam_type": "CAT-1",
+    "start_date": "2026-08-08",
+    "end_date": "2026-08-14",
+    "status": "completed",
+    "notes": "Continuous Assessment Test 1 (Fall 2026)",
+    "created_at": "2026-07-01T09:00:00+05:30",
+    "updated_at": "2026-08-15T09:00:00+05:30"
+  },
+  {
+    "calendar_id": "CAL-2026F-CAT2",
+    "academic_year": "2026-2027",
+    "semester": "Fall",
+    "exam_type": "CAT-2",
+    "start_date": "2026-09-25",
+    "end_date": "2026-10-01",
+    "status": "completed",
+    "notes": "Continuous Assessment Test 2 (Fall 2026) - Peak borrowing period",
+    "created_at": "2026-07-01T09:00:00+05:30",
+    "updated_at": "2026-10-02T09:00:00+05:30"
+  },
+  {
+    "calendar_id": "CAL-2026F-CAT1-279366",
+    "academic_year": "2026-2027",
+    "semester": "Fall",
+    "exam_type": "CAT-1",
+    "start_date": "2026-10-25",
+    "end_date": "2026-10-31",
+    "status": "cancelled",
+    "notes": "[Cancelled: Admin deactivated via API]",
+    "created_at": "2026-10-10T14:16:38.647416+05:30",
+    "updated_at": "2026-10-10T14:17:32.252163+05:30"
+  },
+  {
+    "calendar_id": "CAL-2026F-CAT2-6982a7",
+    "academic_year": "2026-2027",
+    "semester": "Fall",
+    "exam_type": "CAT-2",
+    "start_date": "2026-10-25",
+    "end_date": "2026-10-31",
+    "status": "cancelled",
+    "notes": "[Cancelled: Admin deactivated via API]",
+    "created_at": "2026-10-10T14:17:08.968939+05:30",
+    "updated_at": "2026-10-10T14:17:15.623760+05:30"
+  },
+  {
+    "calendar_id": "CAL-2026F-CAT2-97f849",
+    "academic_year": "2026-2027",
+    "semester": "Fall",
+    "exam_type": "CAT-2",
+    "start_date": "2026-10-25",
+    "end_date": "2026-10-31",
+    "status": "scheduled",
+    "notes": "",
+    "created_at": "2026-10-10T14:17:35.408072+05:30",
+    "updated_at": "2026-10-10T14:17:35.408072+05:30"
+  },
+  {
+    "calendar_id": "CAL-2026F-FAT-b2d49e",
+    "academic_year": "2026-2027",
+    "semester": "Fall",
+    "exam_type": "FAT",
+    "start_date": "2026-11-12",
+    "end_date": "2026-11-30",
+    "status": "scheduled",
+    "notes": "",
+    "created_at": "2026-10-10T11:30:03.644762+05:30",
+    "updated_at": "2026-10-10T11:30:03.644762+05:30"
+  },
+  {
+    "calendar_id": "CAL-2026F-FAT",
+    "academic_year": "2026-2027",
+    "semester": "Fall",
+    "exam_type": "FAT",
+    "start_date": "2026-11-20",
+    "end_date": "2026-11-30",
+    "status": "cancelled",
+    "notes": "Final Assessment Test (Fall 2026)",
+    "created_at": "2026-07-01T09:00:00+05:30",
+    "updated_at": "2026-10-19T20:18:54.570615+05:30"
+  },
+  {
+    "calendar_id": "CAL-2027W-CAT1",
+    "academic_year": "2026-2027",
+    "semester": "Winter",
+    "exam_type": "CAT-1",
+    "start_date": "2027-01-26",
+    "end_date": "2027-02-01",
+    "status": "scheduled",
+    "notes": "Continuous Assessment Test 1 (Winter 2027)",
+    "created_at": "2026-10-01T09:00:00+05:30",
+    "updated_at": "2026-10-01T09:00:00+05:30"
+  },
+  {
+    "calendar_id": "CAL-2027W-CAT2",
+    "academic_year": "2026-2027",
+    "semester": "Winter",
+    "exam_type": "CAT-2",
+    "start_date": "2027-03-15",
+    "end_date": "2027-03-21",
+    "status": "scheduled",
+    "notes": "Continuous Assessment Test 2 (Winter 2027)",
+    "created_at": "2026-10-01T09:00:00+05:30",
+    "updated_at": "2026-10-01T09:00:00+05:30"
+  },
+  {
+    "calendar_id": "CAL-2027W-FAT",
+    "academic_year": "2026-2027",
+    "semester": "Winter",
+    "exam_type": "FAT",
+    "start_date": "2027-04-25",
+    "end_date": "2027-05-05",
+    "status": "scheduled",
+    "notes": "Final Assessment Test (Winter 2027)",
+    "created_at": "2026-10-01T09:00:00+05:30",
+    "updated_at": "2026-10-01T09:00:00+05:30"
+  }
+]

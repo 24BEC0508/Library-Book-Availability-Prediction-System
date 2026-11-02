@@ -1,0 +1,38 @@
+# ==============================================================================
+# .gitignore for Library Availability Prediction & DigitalOcean Deployment
+# ==============================================================================
+
+# 1. CRITICAL: Large training datasets (> 100MB exceeds GitHub push limits)
+data/processed/training_data.csv
+
+# 2. Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# 3. Virtual environments
+env/
+venv/
+.venv/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# 4. Binary research archives & temporary files
+WhatsApp*.zip
+
+# 5. Environment variables & credentials
+.env
+.env.local
+.env.*.local
+
+# 6. IDE & OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

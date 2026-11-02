@@ -1,0 +1,372 @@
+
+from pathlib import Path
+
+import pandas as pd
+import numpy as np
+
+# ============================================================
+# 1. PATHS
+# ============================================================
+
+ROOT = Path(__file__).resolve().parent.parent
+
+BOOKS_PATH = ROOT / "data" / "raw" / "books.csv"
+TRANSACTIONS_PATH = ROOT / "data" / "raw" / "transactions.csv"
+OUTPUT_PATH = ROOT / "data" / "processed" / "training_data.csv"
+
+print("Loading source data...", flush=True)
+
+books = pd.read_csv(BOOKS_PATH)
+
+tx = pd.read_csv(
+    TRANSACTIONS_PATH,
+    parse_dates=["transaction_date", "first_exam_date"],
+)
+
+# ============================================================
+# 2. VALIDATE SOURCE DATA
+# ============================================================
+
+required_book_columns = {
+    "book_id", "department", "total_copies"
+}
+
+required_transaction_columns = {
+    "transaction_id",
+    "book_id",
+    "transaction_date",
+    "transaction_type",
+    "exam_cycle_id",
+    "first_exam_date",
+}
+
+missing_books = required_book_columns - set(books.columns)
+missing_tx = required_transaction_columns - set(tx.columns)
+
+if missing_books:
+    raise ValueError(
+        f"Missing columns in books.csv: {sorted(missing_books)}"
+    )
+
+if missing_tx:
+    raise ValueError(
+        f"Missing columns in transactions.csv: {sorted(missing_tx)}"
+    )
+
+if tx.empty:
+    raise ValueError("transactions.csv contains no transactions.")
+
+if tx["transaction_date"].isna().any():
+    raise ValueError("Some transactions have invalid transaction dates.")
+
+if tx["first_exam_date"].isna().any():
+    raise ValueError("Some transactions have missing exam dates.")
+
+tx["transaction_type"] = (
+    tx["transaction_type"].astype(str).str.strip().str.upper()
+)
+
+allowed_types = {"CHECKOUT", "RETURN"}
+unexpected_types = set(tx["transaction_type"].unique()) - allowed_types
+
+if unexpected_types:
+    raise ValueError(
+        f"Unexpected transaction types: {sorted(unexpected_types)}"
+    )
+
+# Normalize dates to midnight so each calendar day has one row.
+tx["date"] = tx["transaction_date"].dt.normalize()
+tx["first_exam_date"] = tx["first_exam_date"].dt.normalize()
+
+print(f"Books loaded: {len(books):,}", flush=True)
+print(f"Transactions loaded: {len(tx):,}", flush=True)
+
+# ============================================================
+# 3. COUNT DAILY CHECKOUTS AND RETURNS
+# ============================================================
+
+print("Counting daily transactions...", flush=True)
+
+daily = (
+    tx.pivot_table(
+        index=["book_id", "date"],
+        columns="transaction_type",
+        values="transaction_id",
+        aggfunc="count",
+        fill_value=0,
+    )
+    .reset_index()
+)
+
+daily.columns.name = None
+
+for col in ["CHECKOUT", "RETURN"]:
+    if col not in daily.columns:
+        daily[col] = 0
+
+daily = daily.rename(
+    columns={
+        "CHECKOUT": "daily_checkouts",
+        "RETURN": "daily_returns",
+    }
+)
+
+daily["daily_checkouts"] = daily["daily_checkouts"].astype(np.int32)
+daily["daily_returns"] = daily["daily_returns"].astype(np.int32)
+
+print(f"Book-date records: {len(daily):,}", flush=True)
+
+# ============================================================
+# 4. PREPARE BOOK METADATA
+# ============================================================
+
+active_ids = daily["book_id"].unique()
+
+active_books = books.loc[
+    books["book_id"].isin(active_ids),
+    ["book_id", "department", "total_copies"],
+].copy()
+
+if active_books["book_id"].duplicated().any():
+    raise ValueError("books.csv contains duplicate book_id values.")
+
+# ============================================================
+# 5. BUILD DAILY FEATURES FOR EACH ACTIVE BOOK
+# ============================================================
+
+start_date = tx["date"].min()
+end_date = tx["date"].max()
+
+all_dates = pd.date_range(
+    start=start_date,
+    end=end_date,
+    freq="D",
+)
+
+print(f"Timeline begins: {start_date.date()}", flush=True)
+print(f"Timeline ends:   {end_date.date()}", flush=True)
+print(f"Days in timeline: {len(all_dates):,}", flush=True)
+
+parts = []
+
+for i, (book_id, group) in enumerate(
+    daily.groupby("book_id", sort=False),
+    start=1,
+):
+    group = (
+        group[["date", "daily_checkouts", "daily_returns"]]
+        .set_index("date")
+        .reindex(all_dates)
+    )
+
+    group.index.name = "date"
+    group["book_id"] = book_id
+
+    group["daily_checkouts"] = (
+        group["daily_checkouts"].fillna(0)
+    )
+    group["daily_returns"] = (
+        group["daily_returns"].fillna(0)
+    )
+
+    # Features at date t use information only through date t-1.
+    prior_checkouts = group["daily_checkouts"].shift(1)
+    prior_returns = group["daily_returns"].shift(1)
+
+    group["checkouts_last_1d"] = (
+        prior_checkouts.rolling(1, min_periods=1).sum()
+    )
+
+    group["checkouts_last_3d"] = (
+        prior_checkouts.rolling(3, min_periods=3).sum()
+    )
+
+    group["checkouts_last_7d"] = (
+        prior_checkouts.rolling(7, min_periods=7).sum()
+    )
+
+    group["returns_last_7d"] = (
+        prior_returns.rolling(7, min_periods=7).sum()
+    )
+
+    group["demand_growth"] = (
+        group["checkouts_last_3d"] / 3.0
+        - group["checkouts_last_7d"] / 7.0
+    )
+
+    # Target: total checkouts on days t+1 through t+7.
+    future_checkouts = group["daily_checkouts"].shift(-1)
+
+    group["target_next_7d_checkouts"] = (
+        future_checkouts.iloc[::-1]
+        .rolling(7, min_periods=7)
+        .sum()
+        .iloc[::-1]
+    )
+
+    group = group.reset_index()
+
+    parts.append(group)
+
+    if i % 500 == 0:
+        print(
+            f"Processed {i:,} active books...",
+            flush=True,
+        )
+
+print("Combining daily features...", flush=True)
+
+daily_features = pd.concat(parts, ignore_index=True)
+
+del parts
+del daily
+
+print(
+    f"Daily feature rows created: {len(daily_features):,}",
+    flush=True,
+)
+
+# ============================================================
+# 6. ATTACH BOOK METADATA
+# ============================================================
+
+print("Adding book metadata...", flush=True)
+
+training = daily_features.merge(
+    active_books,
+    on="book_id",
+    how="left",
+    validate="many_to_one",
+)
+
+del daily_features
+
+# ============================================================
+# 7. PREPARE THE EXAM CALENDAR
+# ============================================================
+
+print("Preparing exam calendar...", flush=True)
+
+exam_dates = (
+    tx[["exam_cycle_id", "first_exam_date"]]
+    .dropna()
+    .drop_duplicates()
+    .sort_values("first_exam_date")
+)
+
+# Each exam date should map to one exam cycle.
+duplicate_dates = exam_dates[
+    exam_dates["first_exam_date"].duplicated(keep=False)
+]
+
+if not duplicate_dates.empty:
+    raise ValueError(
+        "Multiple exam cycles share the same first_exam_date. "
+        "Review the exam calendar in transactions.csv before continuing."
+    )
+
+# merge_asof requires both inputs to be sorted by their date key.
+training = training.sort_values("date")
+
+training = pd.merge_asof(
+    training,
+    exam_dates.sort_values("first_exam_date"),
+    left_on="date",
+    right_on="first_exam_date",
+    direction="forward",
+    allow_exact_matches=True,
+)
+
+training["days_to_first_exam"] = (
+    training["first_exam_date"] - training["date"]
+).dt.days
+
+training["exam_type"] = (
+    training["exam_cycle_id"]
+    .astype("string")
+    .str.extract(r"_(CAT1|CAT2|FAT)$", expand=False)
+)
+
+# ============================================================
+# 8. SELECT FINAL COLUMNS AND REMOVE INVALID ROWS
+# ============================================================
+
+feature_columns = [
+    "book_id",
+    "date",
+    "department",
+    "total_copies",
+    "checkouts_last_1d",
+    "checkouts_last_3d",
+    "checkouts_last_7d",
+    "returns_last_7d",
+    "demand_growth",
+    "exam_cycle_id",
+    "first_exam_date",
+    "days_to_first_exam",
+    "exam_type",
+    "target_next_7d_checkouts",
+]
+
+print("Cleaning final training table...", flush=True)
+
+training = training.dropna(subset=feature_columns)
+
+training = training[
+    (training["days_to_first_exam"] >= 0)
+    & (training["target_next_7d_checkouts"] >= 0)
+    & (training["total_copies"] > 0)
+].copy()
+
+# Ensure the target is an actual count.
+training["target_next_7d_checkouts"] = (
+    training["target_next_7d_checkouts"].astype(np.int32)
+)
+
+# ============================================================
+# 9. SAVE THE TRAINING DATASET
+# ============================================================
+
+OUTPUT_PATH.parent.mkdir(
+    parents=True,
+    exist_ok=True,
+)
+
+print("Writing training_data.csv...", flush=True)
+
+training[feature_columns].to_csv(
+    OUTPUT_PATH,
+    index=False,
+)
+
+# ============================================================
+# 10. SUMMARY
+# ============================================================
+
+print("\nTRAINING DATASET CREATED")
+print("=" * 45)
+
+print(f"Rows: {len(training):,}")
+print(f"Columns: {len(feature_columns)}")
+print(f"Date range: {training['date'].min().date()} "
+      f"to {training['date'].max().date()}")
+
+print("\nColumns:")
+print(feature_columns)
+
+print("\nTarget statistics:")
+print(training["target_next_7d_checkouts"].describe())
+
+print("\nTarget distribution:")
+print(
+    training["target_next_7d_checkouts"]
+    .value_counts()
+    .sort_index()
+    .head(10)
+    .to_string()
+)
+
+print("\nExam type distribution:")
+print(training["exam_type"].value_counts(dropna=False).to_string())
+
+print(f"\nSaved to: {OUTPUT_PATH}", flush=True)

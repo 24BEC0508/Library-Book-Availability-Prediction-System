@@ -1,0 +1,6 @@
+Model,MAE_Nonzero_Demand,MAE_CAT2_Near_Exam,RMSE_CAT2_Near_Exam,R2_CAT2_Near_Exam
+Always Predict Zero baseline,1.021275,0.040229,0.20857,-0.038639
+Historical Average baseline,1.001519,0.058456,0.205675,-0.010007
+Multiple Linear Regression,0.989716,0.082738,0.204636,0.000175
+Decision Tree Regressor,0.982024,0.100785,0.227262,-0.233144
+Random Forest Regressor,0.982181,0.100638,0.223367,-0.191235

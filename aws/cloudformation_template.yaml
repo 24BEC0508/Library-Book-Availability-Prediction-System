@@ -1,0 +1,318 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Library Book Availability Prediction & Stockout Early Warning Service
+  Serverless Architecture: API Gateway (HTTP API v2) -> AWS Lambda -> DynamoDB & S3
+  Includes Authoritative Academic Calendar Table, Live Movement Stores, and Automatic Exam Countdown
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, staging, prod]
+    Description: Deployment stage environment.
+
+  ExistingS3BucketName:
+    Type: String
+    Default: library-management-ml-pred
+    Description: Existing private S3 bucket containing trained model artifacts.
+
+  S3ModelKey:
+    Type: String
+    Default: model/regression_model.npz
+    Description: S3 object key path for the trained model artifact.
+
+  PandasLayerArn:
+    Type: String
+    Default: arn:aws:lambda:ap-south-1:336392948345:layer:AWSSDKPandas-Python312:12
+    Description: AWS Managed Layer for Pandas and NumPy (Python 3.12 in ap-south-1).
+
+Resources:
+  # ------------------------------------------------------------
+  # 1. DynamoDB: Operational Book Catalog & Availability State
+  # ------------------------------------------------------------
+  LibraryCatalogTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "LibraryCatalog-${Environment}"
+      BillingMode: PAY_PER_REQUEST # Free-tier friendly, no idle cost
+      AttributeDefinitions:
+        - AttributeName: book_id
+          AttributeType: S
+        - AttributeName: department
+          AttributeType: S
+      KeySchema:
+        - AttributeName: book_id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: DepartmentIndex
+          KeySchema:
+            - AttributeName: department
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+        - Key: Project
+          Value: LibraryAvailabilityPrediction
+        - Key: Environment
+          Value: !Ref Environment
+
+  # ------------------------------------------------------------
+  # 2. DynamoDB: Authoritative Academic Calendar & Exam Schedule
+  # ------------------------------------------------------------
+  AcademicCalendarTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "AcademicCalendar-${Environment}"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: calendar_id
+          AttributeType: S
+        - AttributeName: status
+          AttributeType: S
+        - AttributeName: start_date
+          AttributeType: S
+      KeySchema:
+        - AttributeName: calendar_id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: StatusStartDateIndex
+          KeySchema:
+            - AttributeName: status
+              KeyType: HASH
+            - AttributeName: start_date
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+        - Key: Project
+          Value: LibraryAvailabilityPrediction
+        - Key: Environment
+          Value: !Ref Environment
+
+  # ------------------------------------------------------------
+  # 3. DynamoDB: Authoritative Live Library Transactions Movement
+  # ------------------------------------------------------------
+  LibraryTransactionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "LibraryTransactions-${Environment}"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: book_id
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: book_id
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+        - Key: Project
+          Value: LibraryAvailabilityPrediction
+        - Key: Environment
+          Value: !Ref Environment
+
+  # ------------------------------------------------------------
+  # 4. DynamoDB: Active and Historical Student Loans
+  # ------------------------------------------------------------
+  LibraryLoansTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "LibraryLoans-${Environment}"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: loan_id
+          AttributeType: S
+        - AttributeName: student_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: loan_id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: StudentIndex
+          KeySchema:
+            - AttributeName: student_id
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+        - Key: Project
+          Value: LibraryAvailabilityPrediction
+        - Key: Environment
+          Value: !Ref Environment
+
+  # ------------------------------------------------------------
+  # 5. IAM: Least Privilege Execution Role for Lambda
+  # ------------------------------------------------------------
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "LibraryPredictionLambdaRole-${Environment}"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchLoggingPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
+        - PolicyName: DynamoDBReadWritePolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:BatchWriteItem
+                  - dynamodb:ConditionCheckItem
+                Resource:
+                  - !GetAtt LibraryCatalogTable.Arn
+                  - !Sub "${LibraryCatalogTable.Arn}/index/*"
+                  - !GetAtt AcademicCalendarTable.Arn
+                  - !Sub "${AcademicCalendarTable.Arn}/index/*"
+                  - !GetAtt LibraryTransactionsTable.Arn
+                  - !GetAtt LibraryLoansTable.Arn
+                  - !Sub "${LibraryLoansTable.Arn}/index/*"
+        - PolicyName: S3ArtifactReadPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: !Sub "arn:aws:s3:::${ExistingS3BucketName}/*"
+
+  # ------------------------------------------------------------
+  # 6. AWS Lambda: Availability & Demand Prediction Engine
+  # ------------------------------------------------------------
+  PredictionLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "LibraryAvailabilityPredictor-${Environment}"
+      Runtime: python3.12
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 30
+      MemorySize: 512
+      Layers:
+        - !Ref PandasLayerArn
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref LibraryCatalogTable
+          DYNAMODB_CALENDAR_TABLE: !Ref AcademicCalendarTable
+          DYNAMODB_TRANSACTIONS_TABLE: !Ref LibraryTransactionsTable
+          DYNAMODB_LOANS_TABLE: !Ref LibraryLoansTable
+          S3_BUCKET_NAME: !Ref ExistingS3BucketName
+          S3_MODEL_KEY: !Ref S3ModelKey
+          ADMIN_API_KEY: "library-admin-secret-key-2026"
+          APP_ENV: !Ref Environment
+          APP_MODE: "AWS"
+          MODEL_LOCAL_PATH: "/var/task/model/regression_model.npz"
+          BOOKS_LOCAL_PATH: "/var/task/data/raw/books.csv"
+      Code:
+        ZipFile: |
+          def lambda_handler(event, context):
+              return {"statusCode": 200, "body": "Placeholder"}
+      Tags:
+        - Key: Project
+          Value: LibraryAvailabilityPrediction
+
+  # ------------------------------------------------------------
+  # 7. API Gateway: HTTP API v2 (Cost effective, low latency)
+  # ------------------------------------------------------------
+  HttpApiGateway:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub "LibraryAvailabilityApi-${Environment}"
+      ProtocolType: HTTP
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+        AllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - X-Admin-Key
+          - Authorization
+        MaxAge: 300
+
+  HttpApiIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApiGateway
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PredictionLambdaFunction.Arn}/invocations"
+      PayloadFormatVersion: "2.0"
+
+  HttpApiDefaultRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApiGateway
+      RouteKey: "$default"
+      Target: !Sub "integrations/${HttpApiIntegration}"
+
+  HttpApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref HttpApiGateway
+      StageName: "$default"
+      AutoDeploy: true
+
+  LambdaApiGatewayPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt PredictionLambdaFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApiGateway}/*"
+
+Outputs:
+  ApiEndpoint:
+    Description: HTTP API Gateway Public URL
+    Value: !GetAtt HttpApiGateway.ApiEndpoint
+  DynamoDBCatalogTableName:
+    Description: DynamoDB Table for Library Catalog
+    Value: !Ref LibraryCatalogTable
+  AcademicCalendarTableName:
+    Description: DynamoDB Table for Academic Calendar
+    Value: !Ref AcademicCalendarTable
+  TransactionsTableName:
+    Description: DynamoDB Table for Library Transactions Movement
+    Value: !Ref LibraryTransactionsTable
+  LoansTableName:
+    Description: DynamoDB Table for Student Loans
+    Value: !Ref LibraryLoansTable
+  S3BucketName:
+    Description: S3 Bucket for Trained Model Artifacts
+    Value: !Ref ExistingS3BucketName
+  LambdaFunctionName:
+    Description: Prediction Lambda Function Name
+    Value: !Ref PredictionLambdaFunction

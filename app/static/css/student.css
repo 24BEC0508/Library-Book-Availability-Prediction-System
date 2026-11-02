@@ -1,0 +1,633 @@
+/* ==========================================================================
+   Apex University Library - Student Portal Styles
+   ========================================================================== */
+
+/* Hero Search Section */
+.student-hero {
+  background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 36px 32px 28px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.hero-headline {
+  max-width: 780px;
+  margin: 0 auto 20px;
+  text-align: center;
+}
+.hero-headline h2 {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--brand-navy);
+  letter-spacing: -0.5px;
+  line-height: 1.25;
+  margin-bottom: 8px;
+}
+.hero-headline p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Policy Callout inside Hero */
+.policy-callout {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  font-size: 0.8rem;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+/* Prominent Search Bar with Autocomplete */
+.search-wrapper {
+  max-width: 680px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.search-input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 44px 14px 48px;
+  font-size: 1.05rem;
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius-full);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+.search-input:focus {
+  border-color: var(--brand-accent);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+  outline: none;
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 14px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
+  display: none;
+}
+.search-clear-btn:hover {
+  color: var(--text-primary);
+}
+
+/* Autocomplete Dropdown */
+.autocomplete-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  max-height: 380px;
+  overflow-y: auto;
+  z-index: 250;
+  display: none;
+}
+.autocomplete-menu.open {
+  display: block;
+}
+
+.autocomplete-item {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  transition: background-color 0.1s ease;
+}
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+.autocomplete-item:hover, .autocomplete-item.selected {
+  background-color: #f0f7ff;
+}
+
+.ac-info {
+  flex: 1;
+  min-width: 0;
+}
+.ac-title {
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--brand-navy);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ac-meta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.ac-badge {
+  font-size: 0.72rem;
+}
+
+/* Quick Category / Department Chips */
+.category-chips {
+  max-width: 780px;
+  margin: 16px auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.chip {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.chip:hover {
+  background-color: var(--brand-light);
+  border-color: #93c5fd;
+  color: var(--brand-primary);
+}
+.chip.active {
+  background-color: var(--brand-primary);
+  border-color: var(--brand-primary);
+  color: #ffffff;
+}
+
+/* Academic Calendar Widget */
+.exam-alert-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-left: 4px solid var(--brand-accent);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  box-shadow: var(--shadow-xs);
+}
+.exam-alert-left h4 {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+.exam-alert-left .exam-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--brand-navy);
+}
+.exam-alert-left .exam-dates {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+/* Catalog Filter & Browse Bar */
+.catalog-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  margin-bottom: 20px;
+}
+
+.toolbar-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.filter-select {
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  font-size: 0.85rem;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.toolbar-stats {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Book Card Grid */
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.book-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.book-card:hover {
+  border-color: #94a3b8;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.book-dept-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--brand-accent);
+  letter-spacing: 0.4px;
+  margin-bottom: 6px;
+}
+
+.book-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--brand-navy);
+  line-height: 1.35;
+  margin-bottom: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.book-author {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.book-copies-row {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.copies-stat {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.copies-stat span {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* Pagination */
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 28px 0;
+}
+.page-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--border-strong);
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.page-btn:hover:not(:disabled) {
+  background-color: var(--bg-subtle);
+}
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.page-indicator {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Book Details Modal Components */
+.detail-meta-header {
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+.detail-dept {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--brand-accent);
+}
+.detail-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--brand-navy);
+  margin: 4px 0 6px;
+}
+.detail-author {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+/* 3-Tier Grid inside Modal */
+.forecast-tiers-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+@media (max-width: 650px) {
+  .forecast-tiers-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tier-card {
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+.tier-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.4px;
+  margin-bottom: 6px;
+}
+.tier-val {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--brand-navy);
+  line-height: 1.2;
+}
+.tier-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Movement Pills Row */
+.movement-details-box {
+  background-color: #fafafa;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 18px;
+}
+.movement-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 8px;
+}
+@media (max-width: 550px) {
+  .movement-row { grid-template-columns: repeat(2, 1fr); }
+}
+.m-pill {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  text-align: center;
+}
+.m-val {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--brand-primary);
+}
+.m-lbl {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* Transparency & Policy Callout inside Detail */
+.model-transparency-note {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  background-color: #f8fafc;
+  border-left: 3px solid #94a3b8;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  margin-top: 14px;
+  line-height: 1.45;
+}
+
+/* Demo Borrower Selector in Header */
+.demo-profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  margin-left: 12px;
+}
+.demo-profile-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #94a3b8;
+  letter-spacing: 0.4px;
+}
+.demo-profile-select {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+.demo-profile-select option {
+  background-color: var(--brand-navy);
+  color: white;
+}
+
+/* My Borrowed Books Section */
+.borrowed-view-section {
+  animation: fadeIn 0.2s ease-in;
+}
+.borrowed-header-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: white;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-xs);
+}
+.borrowed-header-left h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--brand-navy);
+  margin-bottom: 6px;
+}
+.borrowed-header-left p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+.borrower-summary-pill {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  text-align: right;
+}
+
+.borrowed-loans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+.loan-card {
+  background: white;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+}
+.loan-card:hover {
+  border-color: #94a3b8;
+  box-shadow: var(--shadow-md);
+}
+.loan-card-dept {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--brand-accent);
+  letter-spacing: 0.4px;
+  margin-bottom: 4px;
+}
+.loan-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--brand-navy);
+  margin-bottom: 4px;
+}
+.loan-card-author {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+.loan-meta-box {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 0.82rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.loan-meta-item strong {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.loan-actions-row {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Modal Borrowing Panel */
+.borrow-action-panel {
+  background: #f8fafc;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-top: 16px;
+  margin-bottom: 14px;
+}
+.borrow-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.borrow-panel-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--brand-navy);
+}
+.borrow-meta-note {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.borrow-btn-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}

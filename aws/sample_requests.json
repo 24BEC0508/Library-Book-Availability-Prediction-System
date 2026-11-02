@@ -1,0 +1,124 @@
+{
+  "description": "Sample API Gateway HTTP API v2 requests and responses for Library Availability Prediction",
+  "samples": [
+    {
+      "endpoint": "GET /health",
+      "description": "Health check and model metadata endpoint",
+      "request": {
+        "rawPath": "/health",
+        "requestContext": {
+          "http": {
+            "method": "GET",
+            "path": "/health"
+          }
+        }
+      },
+      "response": {
+        "statusCode": 200,
+        "body": {
+          "status": "HEALTHY",
+          "service": "Library Availability Prediction API",
+          "model": {
+            "methodology": "Multiple Linear Regression (NumPy OLS)",
+            "training_cutoff": "2026-01-01",
+            "historical_baseline_mean": 0.019124,
+            "feature_count": 27
+          },
+          "environment": {
+            "aws_region": "us-east-1",
+            "boto3_available": true
+          }
+        }
+      }
+    },
+    {
+      "endpoint": "GET /books?q=python&department=CSE&limit=2",
+      "description": "Catalog search with query, department filter, and pagination limit",
+      "request": {
+        "rawPath": "/books",
+        "queryStringParameters": {
+          "q": "python",
+          "department": "CSE",
+          "limit": "2"
+        },
+        "requestContext": {
+          "http": {
+            "method": "GET",
+            "path": "/books"
+          }
+        }
+      },
+      "response": {
+        "statusCode": 200,
+        "body": {
+          "total_matches": 1,
+          "returned_count": 1,
+          "books": [
+            {
+              "book_id": "B08510",
+              "title": "Python for Data Analysis",
+              "author": "Wes McKinney",
+              "department": "CSE",
+              "total_copies": 28,
+              "available_copies": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "endpoint": "POST /predict",
+      "description": "Predict 7-day checkout demand and stockout risk for book B08510 leading into CAT-2 exam",
+      "request": {
+        "rawPath": "/predict",
+        "requestContext": {
+          "http": {
+            "method": "POST",
+            "path": "/predict"
+          }
+        },
+        "headers": {
+          "content-type": "application/json"
+        },
+        "body": "{\"book_id\": \"B08510\", \"available_copies\": 1, \"days_to_first_exam\": 7, \"exam_type\": \"CAT2\", \"checkouts_last_7d\": 3.0}"
+      },
+      "response": {
+        "statusCode": 200,
+        "body": {
+          "book_id": "B08510",
+          "title": "Python for Data Analysis",
+          "author": "Wes McKinney",
+          "department": "CSE",
+          "inventory": {
+            "total_copies": 28,
+            "available_copies": 1,
+            "checked_out_copies": 27,
+            "borrowing_policy": "First Come, First Served (FCFS)"
+          },
+          "ml_prediction": {
+            "predicted_next_7d_checkouts": 0.384,
+            "daily_burn_rate": 0.055,
+            "raw_model_output": 0.3841,
+            "historical_training_mean": 0.0191,
+            "methodology": "Multiple Linear Regression (NumPy OLS)"
+          },
+          "stockout_assessment": {
+            "risk_level": "MODERATE",
+            "estimated_days_to_stockout": null,
+            "estimated_stockout_date": null,
+            "warning_message": "Moderate shortage risk: available inventory is low (1 copies remaining). Anticipated CAT2 demand is 0.38 checkouts over next 7 days.",
+            "confidence": "MEDIUM",
+            "explanation": "Inventory buffer is thin. If checkouts accelerate near CAT2, copies may run out."
+          },
+          "exam_context": {
+            "exam_type": "CAT2",
+            "days_to_first_exam": 7,
+            "is_exam_rush_period": true,
+            "historical_cycle_note": "CAT-2 historically drives the highest library borrowing surge (over 54% of all exam checkouts)."
+          },
+          "as_of_date": "2026-10-10"
+        }
+      }
+    }
+  ]
+}

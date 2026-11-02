@@ -1,0 +1,32 @@
+[
+  {
+    "Model": "Always Predict Zero baseline",
+    "MAE": 0.01313,
+    "RMSE": 0.117035,
+    "R-squared": -0.012747
+  },
+  {
+    "Model": "Historical Average baseline",
+    "MAE": 0.032378,
+    "RMSE": 0.116485,
+    "R-squared": -0.003246
+  },
+  {
+    "Model": "Multiple Linear Regression",
+    "MAE": 0.033468,
+    "RMSE": 0.116241,
+    "R-squared": 0.000942
+  },
+  {
+    "Model": "Decision Tree Regressor",
+    "MAE": 0.032234,
+    "RMSE": 0.127158,
+    "R-squared": -0.195525
+  },
+  {
+    "Model": "Random Forest Regressor",
+    "MAE": 0.032287,
+    "RMSE": 0.125255,
+    "R-squared": -0.159999
+  }
+]

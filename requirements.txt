@@ -1,0 +1,6 @@
+# Core dependencies for Library Book Availability Prediction
+numpy>=1.26.0
+pandas>=2.1.0
+
+# Optional AWS Cloud SDK (required only for live cloud provisioning, not local execution)
+# boto3>=1.34.0

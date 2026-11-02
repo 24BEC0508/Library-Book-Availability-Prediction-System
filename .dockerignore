@@ -1,0 +1,56 @@
+# ==============================================================================
+# .dockerignore for DigitalOcean Deployment
+# Keeps the build context minimal (< 15MB) and build times under 15 seconds.
+# ==============================================================================
+
+# 1. Heavy offline training datasets & research files (>1GB)
+data/processed/training_data.csv
+*.pdf
+*.docx
+*.zip
+WhatsApp*
+
+# 2. Python bytecode & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
+
+# 3. Version control & Editor settings
+.git/
+.gitignore
+.gitattributes
+.github/
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# 4. Offline development & AWS-specific infrastructure
+tests/
+docs/
+experiments/
+backup/
+aws/

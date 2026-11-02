@@ -1,0 +1,17 @@
+department,book_records,min_copies,max_copies
+Aerospace,1498,25,30
+Automotive,1498,25,30
+Biomedical,1498,25,30
+Biotechnology,1499,25,30
+CSE,1514,25,30
+Chemical,1499,25,30
+Chemistry,1498,25,30
+Civil,1499,25,30
+Common Engineering,1498,25,30
+ECE,1508,25,30
+EEE,1499,25,30
+IT,1499,25,30
+Mathematics,1498,25,30
+Mechanical,1499,25,30
+Physics,1498,25,30
+Production,1498,25,30

@@ -1,0 +1,6 @@
+Model,MAE,RMSE,R-squared
+Always Predict Zero baseline,0.01313,0.117035,-0.012747
+Historical Average baseline,0.032378,0.116485,-0.003246
+Multiple Linear Regression,0.033468,0.116241,0.000942
+Decision Tree Regressor,0.032234,0.127158,-0.195525
+Random Forest Regressor,0.032287,0.125255,-0.159999

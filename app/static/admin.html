@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apex University Library | Staff Administration & Circulation Console</title>
+  <meta name="description" content="Library staff management console for circulation, catalog holdings, academic calendar, and demand analytics.">
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+  <!-- Institutional Demo Mode Banner -->
+  <aside class="demo-banner" id="operational-mode-banner" role="status" aria-label="Operational Mode">
+    <span class="demo-badge" id="operational-mode-badge">DigitalOcean Cloud</span>
+    <span id="operational-mode-text">Connected to live DigitalOcean production node. Live transactions update in real time.</span>
+  </aside>
+
+  <!-- Staff Header Navigation -->
+  <header class="institution-header">
+    <div class="header-inner">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <a href="/admin" class="brand-identity" aria-label="Library Admin Console">
+          <div class="brand-emblem" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);">⚙️</div>
+          <div class="brand-text">
+            <h1>Apex University Library</h1>
+            <p>Staff Circulation & Management Console</p>
+          </div>
+        </a>
+        <span class="admin-badge-staff">Staff Portal</span>
+      </div>
+
+      <nav class="header-nav" aria-label="Admin Navigation Header">
+        <a href="/" class="btn-nav-portal" style="background-color: #334155; border-color: #475569;" title="Switch back to student view">
+          &larr; Student Portal
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Admin Layout -->
+  <main class="main-wrapper" id="admin-main">
+    <div class="admin-layout">
+
+      <!-- Left Sidebar Navigation -->
+      <aside class="admin-sidebar" aria-label="Administration navigation">
+        <nav>
+          <a href="#overview" class="admin-nav-item active" data-tab="tab-overview">
+            <span class="admin-nav-icon">📊</span> Overview
+          </a>
+          <a href="#circ" class="admin-nav-item" data-tab="tab-circ">
+            <span class="admin-nav-icon">📥</span> Circulation Desk
+          </a>
+          <a href="#inventory" class="admin-nav-item" data-tab="tab-inventory">
+            <span class="admin-nav-icon">📚</span> Catalog Holdings
+          </a>
+          <a href="#calendar" class="admin-nav-item" data-tab="tab-calendar">
+            <span class="admin-nav-icon">🗓️</span> Academic Calendar
+          </a>
+          <a href="#analytics" class="admin-nav-item" data-tab="tab-analytics">
+            <span class="admin-nav-icon">📈</span> Demand Analytics
+          </a>
+          <a href="#audit" class="admin-nav-item" data-tab="tab-audit">
+            <span class="admin-nav-icon">📋</span> Audit Log
+          </a>
+        </nav>
+
+        <!-- Access Control Box -->
+        <div class="admin-auth-box">
+          <label for="admin-key-input" class="admin-auth-label">Admin Secret Key</label>
+          <input
+            type="password"
+            id="admin-key-input"
+            class="admin-key-input"
+            value="library-admin-secret-key-2026"
+            title="Administrator API Authorization Key"
+          >
+          <span style="color: var(--text-muted); font-size: 0.72rem; line-height: 1.3; display: block;">
+            Verified by backend API (<code>X-Admin-Key</code> header). Ready for IAM / Cognito integration in AWS.
+          </span>
+        </div>
+      </aside>
+
+      <!-- Main Content Area with Tab Panes -->
+      <section class="admin-content-area">
+
+        <!-- ===================================================================
+             Tab 1: Overview
+             =================================================================== -->
+        <div class="admin-tab-pane active" id="tab-overview">
+          <div style="margin-bottom: 20px;">
+            <h2 style="color: var(--brand-navy); font-size: 1.5rem; font-weight: 800;">Circulation & Operations Overview</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+              Summary of active library collection holdings, loan utilization, and stockout pressure.
+            </p>
+          </div>
+
+          <!-- KPI Cards Grid -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-title">Catalog Titles</div>
+              <div class="kpi-num" id="kpi-titles">—</div>
+              <div class="kpi-sub">Across 16 departments</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">Total Physical Copies</div>
+              <div class="kpi-num" id="kpi-total-copies">—</div>
+              <div class="kpi-sub">Official inventory holdings</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">In Library (Available)</div>
+              <div class="kpi-num" style="color: var(--status-safe);" id="kpi-available">—</div>
+              <div class="kpi-sub">Ready for student borrowing</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">Active Loans</div>
+              <div class="kpi-num" style="color: var(--brand-accent);" id="kpi-on-loan">—</div>
+              <div class="kpi-sub">Currently with students</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">Low Stock Titles</div>
+              <div class="kpi-num" style="color: var(--status-high);" id="kpi-low-stock">—</div>
+              <div class="kpi-sub">&le; 2 copies remaining</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">Out of Stock Titles</div>
+              <div class="kpi-num" style="color: var(--status-critical);" id="kpi-out-of-stock">—</div>
+              <div class="kpi-sub">0 copies available right now</div>
+            </div>
+          </div>
+
+          <!-- Quick Action Tables -->
+          <div class="table-card">
+            <div class="table-header-row">
+              <div class="table-title">⚠️ Priority Shortage Watchlist</div>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Titles with critical or low buffer</span>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Call Number</th>
+                    <th>Title</th>
+                    <th>Department</th>
+                    <th>Physical Buffer</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="overview-low-stock-table">
+                  <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading metrics...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="table-card">
+            <div class="table-header-row">
+              <div class="table-title">⚡ Recent Circulation Transactions</div>
+              <button class="btn btn-secondary btn-sm" onclick="switchTab('tab-audit')">View Complete Log &rarr;</button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Transaction ID</th>
+                    <th>Action</th>
+                    <th>Book ID</th>
+                    <th>Patron ID</th>
+                    <th>Time (Asia/Kolkata)</th>
+                  </tr>
+                </thead>
+                <tbody id="overview-recent-tx-table">
+                  <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading recent transactions...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             Tab 2: Circulation Desk (Checkouts & Returns)
+             =================================================================== -->
+        <div class="admin-tab-pane" id="tab-circ">
+          <div style="margin-bottom: 20px;">
+            <h2 style="color: var(--brand-navy); font-size: 1.5rem; font-weight: 800;">Circulation Desk Operations</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+              Atomic physical checkouts and returns. Updates authoritative inventory, logs audit receipts,
+              and immediately triggers dynamic recalculation of rolling borrowing velocity and 7-day forecasts.
+            </p>
+          </div>
+
+          <div class="circulation-grid">
+            <!-- Checkout Card -->
+            <div class="circ-card checkout-card">
+              <div class="circ-card-title">
+                <span>📤</span> Issue Book Loan (Checkout)
+              </div>
+              <form id="checkout-form">
+                <div class="form-group">
+                  <label for="checkout-book-id" class="form-label">Book ID / Call Number *</label>
+                  <input type="text" id="checkout-book-id" class="form-control" placeholder="e.g. B08510" required>
+                  <div class="form-help">Enter exact catalog ID (e.g. B08510, B00037, B01926).</div>
+                </div>
+
+                <div class="form-group">
+                  <label for="checkout-student-id" class="form-label">Student / Patron ID</label>
+                  <input type="text" id="checkout-student-id" class="form-control" placeholder="e.g. STU-2026-0914" value="STU-2026-0914">
+                </div>
+
+                <div class="form-group">
+                  <label for="checkout-notes" class="form-label">Circulation Notes (Optional)</label>
+                  <input type="text" id="checkout-notes" class="form-control" placeholder="e.g. Regular 14-day study loan">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                  Execute Checkout
+                </button>
+              </form>
+              <div id="checkout-feedback" style="margin-top: 14px;"></div>
+            </div>
+
+            <!-- Return Card -->
+            <div class="circ-card return-card">
+              <div class="circ-card-title">
+                <span>📥</span> Receive Book Return
+              </div>
+              <form id="return-form">
+                <div class="form-group">
+                  <label for="return-book-id" class="form-label">Book ID / Call Number *</label>
+                  <input type="text" id="return-book-id" class="form-control" placeholder="e.g. B08510" required>
+                  <div class="form-help">Atomic check ensures copies cannot exceed total holdings.</div>
+                </div>
+
+                <div class="form-group">
+                  <label for="return-student-id" class="form-label">Returning Patron ID</label>
+                  <input type="text" id="return-student-id" class="form-control" placeholder="e.g. STU-2026-0914" value="STU-2026-0914">
+                </div>
+
+                <div class="form-group">
+                  <label for="return-notes" class="form-label">Return Condition / Notes</label>
+                  <input type="text" id="return-notes" class="form-control" placeholder="e.g. Returned in good condition">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; background-color: var(--status-safe); border-color: #15803d;">
+                  Process Return
+                </button>
+              </form>
+              <div id="return-feedback" style="margin-top: 14px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             Tab 3: Catalog Holdings & Inventory
+             =================================================================== -->
+        <div class="admin-tab-pane" id="tab-inventory">
+          <div style="margin-bottom: 20px;">
+            <h2 style="color: var(--brand-navy); font-size: 1.5rem; font-weight: 800;">Catalog Inventory Management</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+              Inspect physical copy holdings and availability states across all 24,000 collection records.
+            </p>
+          </div>
+
+          <div class="table-card">
+            <div class="table-header-row">
+              <div style="display: flex; gap: 12px; flex: 1; max-width: 600px;">
+                <input type="search" id="inv-search" class="form-control" placeholder="Search by title, author, or Book ID...">
+                <select id="inv-dept-filter" class="form-control" style="width: auto;">
+                  <option value="">All Departments</option>
+                  <option value="CSE">CSE</option>
+                  <option value="Civil">Civil</option>
+                  <option value="ECE">ECE</option>
+                  <option value="IT">IT</option>
+                  <option value="Mechanical">Mechanical</option>
+                  <option value="Mathematics">Mathematics</option>
+                  <option value="Physics">Physics</option>
+                  <option value="Chemistry">Chemistry</option>
+                  <option value="Common Engineering">Common Engineering</option>
+                </select>
+              </div>
+              <div id="inv-stats" style="font-size: 0.85rem; color: var(--text-muted);">Showing catalog titles</div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Call No</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Department</th>
+                    <th>Edition</th>
+                    <th>Total</th>
+                    <th>Available</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="inv-table-body">
+                  <tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 20px;">Loading catalog records...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             Tab 4: Academic Calendar Management
+             =================================================================== -->
+        <div class="admin-tab-pane" id="tab-calendar">
+          <div style="margin-bottom: 20px;">
+            <h2 style="color: var(--brand-navy); font-size: 1.5rem; font-weight: 800;">Authoritative Academic Calendar Management</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+              University calendar maintained exclusively by library & registrar administrators.
+              Students do not manually specify exam countdowns; all predictions derive countdowns automatically from these records.
+            </p>
+          </div>
+
+          <!-- Schedule New Exam Form -->
+          <div class="table-card" style="margin-bottom: 24px;">
+            <div class="table-title" style="margin-bottom: 14px;">🗓️ Schedule New Academic Examination</div>
+            <form id="add-exam-form">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 12px;">
+                <div class="form-group">
+                  <label class="form-label">Academic Year *</label>
+                  <input type="text" id="new-cal-year" class="form-control" value="2026-2027" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Semester *</label>
+                  <select id="new-cal-sem" class="form-control" required>
+                    <option value="Fall">Fall</option>
+                    <option value="Winter">Winter</option>
+                    <option value="Summer">Summer</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Exam Type *</label>
+                  <select id="new-cal-type" class="form-control" required>
+                    <option value="CAT-1">CAT-1</option>
+                    <option value="CAT-2">CAT-2</option>
+                    <option value="FAT">FAT</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Start Date *</label>
+                  <input type="date" id="new-cal-start" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">End Date *</label>
+                  <input type="date" id="new-cal-end" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Status *</label>
+                  <select id="new-cal-status" class="form-control" required>
+                    <option value="scheduled">Scheduled</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Optional Notes</label>
+                <input type="text" id="new-cal-notes" class="form-control" placeholder="e.g. Official semester calendar revised by university registrar">
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="width: auto;">
+                Save Examination Schedule
+              </button>
+            </form>
+            <div id="cal-feedback" style="margin-top: 10px;"></div>
+          </div>
+
+          <!-- Calendar Table -->
+          <div class="table-card">
+            <div class="table-title" style="margin-bottom: 14px;">Current Authoritative Calendar Records (Asia/Kolkata)</div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Calendar ID</th>
+                    <th>Academic Period</th>
+                    <th>Exam Type</th>
+                    <th>Date Window</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-cal-table-body">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 20px;">Loading calendar records...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             Tab 5: Demand & Shortage Analytics
+             =================================================================== -->
+        <div class="admin-tab-pane" id="tab-analytics">
+          <div style="margin-bottom: 20px;">
+            <h2 style="color: var(--brand-navy); font-size: 1.5rem; font-weight: 800;">Demand & Shortage Risk Analytics</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+              Comparative evaluation between the Academic Linear Regression baseline ($X\beta$),
+              live borrowing velocities, and historical departmental exam surge rates.
+            </p>
+          </div>
+
+          <div class="table-card">
+            <div class="table-title" style="margin-bottom: 14px;">Shortage Risk Analysis on Candidate Holdings</div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Call Number</th>
+                    <th>Title</th>
+                    <th>Department</th>
+                    <th>Buffer</th>
+                    <th>Projected 7d Demand</th>
+                    <th>Daily Burn</th>
+                    <th>Risk Assessment</th>
+                  </tr>
+                </thead>
+                <tbody id="analytics-table-body">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 20px;">Evaluating model projections...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Model Transparency Callout -->
+          <div style="background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 20px; font-size: 0.88rem; line-height: 1.6; color: var(--text-secondary);">
+            <h4 style="color: var(--brand-navy); font-size: 1rem; margin-bottom: 8px;">Methodology & Statistical Transparency</h4>
+            <p style="margin-bottom: 8px;">
+              <strong>Model Shrinkage Reality:</strong> The 12.5M row loan transaction dataset has 98.71% target zeros, causing linear regression OLS coefficients to shrink towards the historical unconditional mean (&asymp; 0.024 checkouts/week).
+            </p>
+            <p>
+              <strong>Operational Hybrid Strategy:</strong> To ensure predictions respond dynamically to live student movement without requiring continuous model retraining, the system evaluates:
+              (1) Recent observed borrowing run-rates (weighted 24h, 3d, 7d velocity),
+              (2) Department historical exam surge rates for CAT-1, CAT-2, and FAT,
+              (3) The academic linear regression prior.
+            </p>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             Tab 6: Transaction Audit Log
+             =================================================================== -->
+        <div class="admin-tab-pane" id="tab-audit">
+          <div style="margin-bottom: 20px;">
+            <h2 style="color: var(--brand-navy); font-size: 1.5rem; font-weight: 800;">Circulation Transaction Audit Log</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+              Immutable audit log of all atomic checkout and return events.
+            </p>
+          </div>
+
+          <div class="table-card">
+            <div class="table-header-row">
+              <div class="table-title">Audit Trail (Latest 50 Events)</div>
+              <button class="btn btn-secondary btn-sm" onclick="loadAuditLog()">🔄 Refresh Log</button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Tx ID</th>
+                    <th>Timestamp</th>
+                    <th>Action</th>
+                    <th>Call No</th>
+                    <th>Patron ID</th>
+                    <th>Copies After</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="audit-table-body">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 20px;">Loading audit transactions...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- Institutional Footer -->
+  <footer class="institutional-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <h3>Apex University Library Administration</h3>
+        <p>Restricted access management portal for authorized library staff and circulation librarians.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="/">Student Portal</a></li>
+          <li><a href="#tab-circ" onclick="switchTab('tab-circ')">Circulation Desk</a></li>
+          <li><a href="#tab-calendar" onclick="switchTab('tab-calendar')">Academic Calendar</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>System Status</h4>
+        <p style="font-size: 0.8rem; color: #94a3b8;" id="operational-mode-system-status">
+          Environment: <strong>DigitalOcean Cloud Production</strong><br>
+          Service: <strong>App Platform / Droplet Container</strong><br>
+          Policy: First-Come, First-Served (FCFS)
+        </p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>&copy; 2026 Apex University Libraries. Staff Administration Console.</div>
+      <div id="operational-mode-footer">Operating on DigitalOcean Cloud</div>
+    </div>
+  </footer>
+
+  <script src="/js/config.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

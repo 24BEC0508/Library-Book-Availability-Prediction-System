@@ -1,0 +1,23 @@
+[Unit]
+Description=Library Book Availability Prediction & Stockout Warning System
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/library-predictor
+Environment="PORT=8000"
+Environment="HOST=0.0.0.0"
+Environment="CLOUD_PROVIDER=DigitalOcean"
+Environment="DO_REGION=blr1"
+Environment="APP_TIMEZONE=Asia/Kolkata"
+Environment="ADMIN_API_KEY=library-admin-secret-key-2026"
+ExecStart=/usr/bin/python3 /opt/library-predictor/app/api.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

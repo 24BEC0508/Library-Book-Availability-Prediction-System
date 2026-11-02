@@ -1,0 +1,42 @@
+{
+  "test_rows": 2277691,
+  "nonzero_rows": 29283,
+  "cat2_near_exam_rows": 141765,
+  "subsets": [
+    {
+      "Model": "Always Predict Zero baseline",
+      "MAE_Nonzero_Demand": 1.021275,
+      "MAE_CAT2_Near_Exam": 0.040229,
+      "RMSE_CAT2_Near_Exam": 0.20857,
+      "R2_CAT2_Near_Exam": -0.038639
+    },
+    {
+      "Model": "Historical Average baseline",
+      "MAE_Nonzero_Demand": 1.001519,
+      "MAE_CAT2_Near_Exam": 0.058456,
+      "RMSE_CAT2_Near_Exam": 0.205675,
+      "R2_CAT2_Near_Exam": -0.010007
+    },
+    {
+      "Model": "Multiple Linear Regression",
+      "MAE_Nonzero_Demand": 0.989716,
+      "MAE_CAT2_Near_Exam": 0.082738,
+      "RMSE_CAT2_Near_Exam": 0.204636,
+      "R2_CAT2_Near_Exam": 0.000175
+    },
+    {
+      "Model": "Decision Tree Regressor",
+      "MAE_Nonzero_Demand": 0.982024,
+      "MAE_CAT2_Near_Exam": 0.100785,
+      "RMSE_CAT2_Near_Exam": 0.227262,
+      "R2_CAT2_Near_Exam": -0.233144
+    },
+    {
+      "Model": "Random Forest Regressor",
+      "MAE_Nonzero_Demand": 0.982181,
+      "MAE_CAT2_Near_Exam": 0.100638,
+      "RMSE_CAT2_Near_Exam": 0.223367,
+      "R2_CAT2_Near_Exam": -0.191235
+    }
+  ]
+}

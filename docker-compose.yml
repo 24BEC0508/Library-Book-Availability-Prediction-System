@@ -1,0 +1,32 @@
+version: "3.8"
+
+# ==============================================================================
+# Docker Compose configuration for DigitalOcean Droplet & Local Docker Runs
+# ==============================================================================
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: library-demand-predictor:latest
+    container_name: library_predictor_web
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - CLOUD_PROVIDER=DigitalOcean
+      - DO_REGION=blr1
+      - APP_TIMEZONE=Asia/Kolkata
+      - ADMIN_API_KEY=${ADMIN_API_KEY:-library-admin-secret-key-2026}
+    volumes:
+      # Mount data directory so operational state persists on Droplet SSD across updates
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

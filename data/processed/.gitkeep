@@ -1,0 +1,1 @@
+# Keeps data/processed/ directory structure in Git while ignoring the 1.03GB training_data.csv
